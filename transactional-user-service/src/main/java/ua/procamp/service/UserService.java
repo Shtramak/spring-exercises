@@ -1,13 +1,16 @@
 package ua.procamp.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ua.procamp.dao.UserDao;
 import ua.procamp.model.jpa.Role;
 import ua.procamp.model.jpa.RoleType;
 import ua.procamp.model.jpa.User;
 
 import java.util.List;
-
-import static java.util.stream.Collectors.toList;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * This class proovides {@link User} related service logic.
@@ -18,22 +21,35 @@ import static java.util.stream.Collectors.toList;
  * todo: 4. Configure {@link UserService#getAll()} as read-only method
  * todo: 4. Configure {@link UserService#getAllAdmins()} as read-only method
  */
+@Service
+@Transactional
 public class UserService {
+    @Autowired
     private UserDao userDao;
 
     public void save(User user) {
-        throw new UnsupportedOperationException("Keep calm and implement the method");
+        userDao.save(user);
     }
 
+    @Transactional(readOnly = true)
     public List<User> getAll() {
-        throw new UnsupportedOperationException("Keep calm and implement the method");
+        return userDao.findAll();
     }
 
+    @Transactional(readOnly = true)
     public List<User> getAllAdmins() {
-        throw new UnsupportedOperationException("Keep calm and implement the method");
+        List<User> allUsers = userDao.findAll();
+        return allUsers.stream()
+                .filter(user -> user.getRoles()
+                        .stream()
+                        .map(Role::getRoleType)
+                        .anyMatch(rt -> rt.equals(RoleType.ADMIN)))
+                .collect(Collectors.toList());
     }
 
     public void addRole(Long userId, RoleType roleType) {
-        throw new UnsupportedOperationException("Keep calm and implement the method");
+        User user = userDao.findById(userId);
+        Set<Role> roles = user.getRoles();
+        roles.add(Role.valueOf(roleType));
     }
 }
