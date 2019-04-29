@@ -1,8 +1,12 @@
 package ua.procamp.config;
 
-import ua.procamp.TestDataGenerator;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.ComponentScan.Filter;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import ua.procamp.TestDataGenerator;
 
 /**
  * This class provides application root (non-web) configuration.
@@ -12,5 +16,12 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
  * todo: 3. Exclude web related config and beans (ignore @{@link Controller}, ignore {@link EnableWebMvc})
  * todo: 4. Configure {@link TestDataGenerator} bean with name "dataGenerator" (don't specify name explicitly)
  */
+@Configuration
+@ComponentScan(basePackages = "ua.procamp",
+        excludeFilters = {@Filter(Controller.class), @Filter(EnableWebMvc.class)})
 public class RootConfig {
+    @Bean
+    public TestDataGenerator dataGenerator(){
+        return new TestDataGenerator();
+    }
 }
